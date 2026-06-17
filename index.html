@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رفاعي | معرض الوحش وحلبة التحدي</title>
+    <!-- Meta Descriptions for SEO -->
+    <meta name="description" content="مرحباً بك في معرض أعمال رفاعي. أثبت سرعتك في حلبة تحدي الكتابة. تصميم مانجا ياباني مستوحى من كينجي من براول ستارز.">
+    <!-- Google Fonts: Space Grotesk, Dela Gothic One (bold manga look), Sawarabi Mincho, Tajawal (for beautiful Arabic typography) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Dela+Gothic+One&family=Sawarabi+Mincho&family=Tajawal:wght@400;500;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Sword Slash Canvas for screen-slice effects -->
+    <canvas id="slash-canvas"></canvas>
+
+    <!-- Custom Cursor -->
+    <div id="custom-cursor"></div>
+    <div id="cursor-trail"></div>
+
+    <!-- Manga Overlay Halftone Pattern -->
+    <div class="halftone-overlay"></div>
+
+    <!-- Background Speed Lines (activated during combos) -->
+    <div id="speed-lines"></div>
+
+    <!-- Interactive Audio & Language Toggle Container -->
+    <div class="floating-controls">
+        <button id="sound-toggle" class="sound-toggle" aria-label="Toggle Sound Effects">
+            <span class="icon">🔊</span> صوت: تفعيل
+        </button>
+        <button id="lang-toggle" class="lang-toggle" aria-label="Toggle Language">
+            🌐 English
+        </button>
+    </div>
+
+    <!-- Main Navigation -->
+    <header class="manga-header">
+        <div class="header-logo">
+            <span class="logo-slash">//</span> رفاعي
+        </div>
+        <nav class="nav-links">
+            <a href="#hero" class="nav-link" data-key="nav-home">الرئيسية</a>
+            <a href="#projects" class="nav-link" data-key="nav-manga">المشاريع</a>
+            <a href="#stats" id="nav-promo" class="nav-link" data-key="nav-stats">الترويج</a>
+            <a href="#hero" class="nav-link" data-key="nav-about">عني</a>
+            <a href="#typing-arena" class="nav-link highlight" data-key="nav-arena">تحدي سرعة الكتابة</a>
+        </nav>
+        <div class="header-actions" id="header-auth-actions">
+            <button class="btn-secondary" id="btn-signin" data-key="btn-signin">تسجيل الدخول</button>
+            <button class="btn-primary" id="btn-signup" data-key="btn-signup">أنشئ حساباً</button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main id="hero" class="hero-section">
+        <!-- Floating Arabic brush texts in background -->
+        <div class="bg-brush-text top-left" data-key="bg-brush-1">عزيمة</div>
+        <div class="bg-brush-text bottom-right" data-key="bg-brush-2">الوحش</div>
+
+        <!-- Main Manga Panel Layout -->
+        <div class="manga-grid">
+            
+            <!-- Panel 1: The Portrait (Left Panel) -->
+            <div class="manga-panel panel-portrait" id="panel-me">
+                <div class="panel-inner">
+                    <img src="./me.png" alt="REFAI Portrait" class="manga-image portrait-img">
+                    <div class="panel-label">REFAI.PNG</div>
+                    <!-- Decorative Manga Speed lines in panel -->
+                    <div class="panel-speed-lines"></div>
+                </div>
+            </div>
+
+            <!-- Panel 2: The Core Concept (Center Panel) -->
+            <div class="manga-panel panel-hero-text" id="panel-concept">
+                <div class="panel-inner">
+                    <div class="design-label">
+                        <span class="red-box" data-key="hero-name-label">أحمد الرفاعي</span>
+                        <span class="black-outline" data-key="hero-role-label">صانع البرمجيات</span>
+                    </div>
+                    
+                    <h1 class="main-japanese-title" data-key="hero-main-title">البرمجة طاقة وتأثير</h1>
+                    <p class="sub-agency-text" data-key="hero-philosophy">أطور برمجيات عالية الكفاءة لمساعدة المحلات والشركات المحلية في مصر على النمو والتطور.</p>
+                    <p class="tagline-text" data-key="hero-status">خريج حاسبات عين شمس (2026) // مؤسس E5traat</p>
+                    
+                    <!-- Decorative ink splatters (inline SVG for crispness) -->
+                    <div class="ink-splatter splatter-center">
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M50 20 C40 10, 25 15, 30 35 C20 40, 10 55, 30 65 C25 80, 45 90, 55 75 C70 85, 90 70, 80 50 C95 35, 75 15, 50 20 Z" fill="#000" />
+                            <circle cx="20" cy="25" r="3" fill="#000"/>
+                            <circle cx="85" cy="30" r="4" fill="#000"/>
+                            <circle cx="75" cy="80" r="5" fill="#000"/>
+                            <circle cx="15" cy="70" r="2" fill="#000"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 3: Stats & Character Card (Right Panel - unclipped for perfect fit) -->
+            <div class="manga-panel panel-stats" id="panel-stats-card">
+                <div class="panel-inner">
+                    <img src="./REFAI's Stats Card.png" alt="REFAI Stats Card" class="manga-image stats-img">
+                    <div class="panel-label" data-key="panel-label-stats">بطاقة القوة</div>
+                    <div class="character-card-overlay">
+                        <div class="stat-badge" data-key="badge-rank">الرتبة: SSS</div>
+                        <div class="stat-badge red" data-key="badge-class">الفئة: بايثون</div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Hero Actions Footer (Under Grid) -->
+        <div class="hero-footer">
+            <div class="year-indicator">2020 _ 2026 /////////</div>
+            <div class="hero-buttons">
+                <!-- Smooth scrolls to bottom typing test -->
+                <button id="btn-be-cool" class="btn-be-cool" data-key="btn-be-cool">
+                    <span class="btn-text">كن رائعاً!</span>
+                    <span class="btn-slash-effect"></span>
+                    <span class="btn-arrow">➔</span>
+                </button>
+                <button class="btn-contact-us" id="btn-hero-contact" data-key="btn-contact" onclick="document.getElementById('typing-arena').scrollIntoView({ behavior: 'smooth' })">
+                    اتصل بنا
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Project Panels Section -->
+    <section id="projects" class="projects-section">
+        <h2 class="section-title"><span class="title-bg" data-key="projects-title">لفافات البرمجة // 案件</span></h2>
+        
+        <div class="projects-grid">
+            <!-- Project 1: CSHub -->
+            <div class="project-card">
+                <div class="project-panel-header" data-key="p1-header">المشروع 01 // [CSHub]</div>
+                <div class="project-content">
+                    <div class="project-screentone"></div>
+                    <h3 data-key="p1-title">CSHub (مشروع التخرج)</h3>
+                    <p data-key="p1-desc">قائد هندسة الخلفية والذكاء الاصطناعي. قمنا ببناء معالج صوتي لتلخيص الاجتماعات ومحلل أكواد برمجية معقدة بتقنية شجرة البناء المجردة.</p>
+                    <div class="project-tags"><span>Python</span><span>AST Parsing</span><span>Audio AI</span></div>
+                </div>
+            </div>
+
+            <!-- Project 2: E5traat Engine -->
+            <div class="project-card">
+                <div class="project-panel-header" data-key="p2-header">المشروع 02 // [محرك إيسترات]</div>
+                <div class="project-content">
+                    <div class="project-screentone"></div>
+                    <h3 data-key="p2-title">محرك E5traat التجاري</h3>
+                    <p data-key="p2-desc">منصة تجارة وتحليلات ذكية متعددة المستأجرين لمساعدة المحلات التجارية والشركات الصغيرة في مصر على التطور وإدارة المبيعات بكفاءة.</p>
+                    <div class="project-tags"><span>Multi-tenancy</span><span>PostgreSQL</span><span>FastAPI</span></div>
+                </div>
+            </div>
+
+            <!-- Project 3: Way Back Home -->
+            <div class="project-card">
+                <div class="project-panel-header" data-key="p3-header">المشروع 03 // [طريق العودة للديار]</div>
+                <div class="project-content">
+                    <div class="project-screentone"></div>
+                    <h3 data-key="p3-title">Way Back Home (سحابي)</h3>
+                    <p data-key="p3-desc">مشروع سحابي متطور لتصميم وبناء نموذج توليد نصوص مدعم باسترجاع معتمد على الرسوم البيانية (Graph-RAG).</p>
+                    <div class="project-tags"><span>Google Cloud</span><span>Graph RAG</span><span>networkx</span></div>
+                </div>
+            </div>
+
+            <!-- Project 4: Resumizer -->
+            <div class="project-card">
+                <div class="project-panel-header" data-key="p4-header">المشروع 04 // [ريزوميزر]</div>
+                <div class="project-content">
+                    <div class="project-screentone"></div>
+                    <h3 data-key="p4-title">Resumizer (معالج السير الذاتية)</h3>
+                    <p data-key="p4-desc">تطبيق واجهة خلفية مبني على معالجة اللغات الطبيعية (NLP) لاستقبال السير الذاتية وتحليلها وتلخيصها بكفاءة عالية.</p>
+                    <div class="project-tags"><span>FastAPI</span><span>NLP</span><span>Docker</span></div>
+                </div>
+            </div>
+
+            <!-- Project 5: Auto PDF -->
+            <div class="project-card">
+                <div class="project-panel-header" data-key="p5-header">المشروع 05 // [أوتو بي دي إف]</div>
+                <div class="project-content">
+                    <div class="project-screentone"></div>
+                    <h3 data-key="p5-title">Auto PDF (ميكنة التقارير)</h3>
+                    <p data-key="p5-desc">أداة مساعدة خفيفة للمطورين لأتمتة سحب البيانات من ملفات CSV وتحويلها إلى تقارير PDF منسقة وجميلة.</p>
+                    <div class="project-tags"><span>HTML/CSS templates</span><span>PDF Generator</span><span>Python</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Typing speed test section: The Typing Speed Test -->
+    <section id="typing-arena" class="typing-arena-section">
+        <div class="arena-background-brush"></div>
+
+        <div class="arena-header">
+            <h2 class="arena-title" data-key="arena-title">تحدي سرعة الكتابة</h2>
+            <div class="arena-subtitle" data-key="arena-subtitle">اختبر مهارتك وسرعتك في البرمجة</div>
+            <p class="arena-desc" data-key="arena-desc">"أنا أحمد الرفاعي، وأؤمن بأن سرعة الكتابة والإنتاجية هما مفتاح التميز البرمجي. اختبر سرعتك وتعرف على مستواك الحقيقي."</p>
+        </div>
+
+        <div class="arena-game-container">
+            <!-- Combat HUD Display -->
+            <div class="hud-stats">
+                <div class="hud-stat-box" id="hud-wpm">
+                    <div class="hud-stat-label" data-key="hud-wpm">الكلمات/الدقيقة</div>
+                    <div class="hud-stat-value">000</div>
+                    <div class="hud-stat-bar"><div class="bar-fill" style="width: 0%"></div></div>
+                </div>
+                
+                <div class="hud-stat-box" id="hud-accuracy">
+                    <div class="hud-stat-label" data-key="hud-accuracy">الدقة</div>
+                    <div class="hud-stat-value">100%</div>
+                    <div class="hud-stat-bar"><div class="bar-fill" style="width: 100%"></div></div>
+                </div>
+
+                <div class="hud-stat-box" id="hud-timer">
+                    <div class="hud-stat-label" data-key="hud-timer">الوقت المتبقي</div>
+                    <div class="hud-stat-value">30</div>
+                    <div class="hud-stat-bar"><div class="bar-fill" style="width: 100%"></div></div>
+                </div>
+
+                <div class="hud-stat-box" id="hud-streak">
+                    <div class="hud-stat-label" data-key="hud-streak">الضربات المتتالية</div>
+                    <div class="hud-stat-value">x0</div>
+                    <div class="hud-stat-bar"><div class="bar-fill" style="width: 0%"></div></div>
+                </div>
+            </div>
+
+            <!-- Typing Challenge Core Box -->
+            <div class="typing-box-wrapper">
+                <!-- Comic strip style border and ink spills -->
+                <div class="typing-corner-decoration tl"></div>
+                <div class="typing-corner-decoration br"></div>
+                
+                <div class="typing-box" id="typing-box">
+                    <div class="words-container" id="words-container">
+                        <!-- Words will be injected here via JS -->
+                        <span class="word-placeholder">جاري تحميل النصوص...</span>
+                    </div>
+                </div>
+
+                <!-- Input area for typing - Highly visible and styled -->
+                <div class="typing-input-container">
+                    <div class="input-sword-decor">⚔️</div>
+                    <textarea id="typing-input" class="typing-input-visible" data-placeholder="ابدأ بكتابة الكلمة الأولى واضغط مسافة لتشغيل المؤقت..." placeholder="ابدأ بكتابة الكلمة الأولى واضغط مسافة لتشغيل المؤقت..." autocomplete="off" rows="1"></textarea>
+                </div>
+                <div id="video-hint" class="video-hint hidden"></div>
+            </div>
+
+            <!-- Arena Controls -->
+            <div class="arena-controls">
+                <button id="btn-restart" class="btn-restart">
+                    <span class="btn-restart-icon">🔄</span> <span data-key="btn-reset">إعادة المحاولة</span>
+                </button>
+                <div class="selectors-container">
+                    <div class="quote-selector-wrapper">
+                        <label for="test-type-select" data-key="test-type-label">نوع التحدي:</label>
+                        <select id="test-type-select" class="quote-select">
+                            <option value="code" data-key="opt-code" selected>كود برمجي (بايثون)</option>
+                            <option value="text" data-key="opt-text">نص عادي</option>
+                        </select>
+                    </div>
+                    <div class="quote-selector-wrapper">
+                        <label for="quote-select" data-key="select-label">اختر نمط التحدي:</label>
+                        <select id="quote-select" class="quote-select">
+                            <option value="binary_search">البحث الثنائي // Binary Search</option>
+                            <option value="bubble_sort">فرز الفقاعات // Bubble Sort</option>
+                            <option value="insertion_sort">فرز الإدخال // Insertion Sort</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success overlay for Rank evaluation -->
+        <div id="rank-overlay" class="rank-overlay hidden">
+            <div class="rank-box">
+                <div class="slash-mark"></div>
+                <h3 class="rank-heading" data-key="rank-heading">التقييم النهائي</h3>
+                <div class="rank-title" id="rank-title">مطور متميز</div>
+                <div class="rank-metrics">
+                    <div class="metric"><span class="label" data-key="rank-wpm-label">السرعة:</span> <span class="val" id="rank-wpm">78 WPM</span></div>
+                    <div class="metric"><span class="label" data-key="rank-acc-label">الدقة:</span> <span class="val" id="rank-acc">98%</span></div>
+                </div>
+                <p class="rank-commentary" id="rank-commentary">"أداء متميز. أصابعك سريعة وضرباتك متقنة تحت الضغط."</p>
+                <button id="btn-rank-close" class="btn-primary" data-key="rank-btn-close">تابع التدريب</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="manga-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3>رفاعي</h3>
+                <p data-key="footer-desc">لا ترضى بالوقوف في الظلال. كن وحشاً دائماً.</p>
+            </div>
+            <div class="footer-links">
+                <div class="link-col">
+                    <h4 data-key="f-ranks-title">مستويات التقييم</h4>
+                    <ul>
+                        <li>&gt; 90 WPM: مهندس خبير // Elite</li>
+                        <li>60 - 90 WPM: مطور متميز // Senior</li>
+                        <li>30 - 60 WPM: مطور مبتدئ // Junior</li>
+                        <li>&lt; 30 WPM: متدرب // Intern</li>
+                    </ul>
+                </div>
+                <div class="link-col">
+                    <h4>SOCIAL</h4>
+                    <ul>
+                        <li><a href="https://github.com/ahmed-elrefai" target="_blank" rel="noopener noreferrer">GITHUB</a></li>
+                        <li><a href="https://www.youtube.com/@ibnalrefai" target="_blank" rel="noopener noreferrer">YOUTUBE</a></li>
+                        <li><a href="https://www.linkedin.com/in/ahmed-elrefai/" target="_blank" rel="noopener noreferrer">LINKEDIN</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom" data-key="footer-copy">
+            &copy; 2026 رفاعي. جميع الحقوق محفوظة. // تصميم وتطوير محرك الوحش
+        </div>
+    </footer>
+
+    <!-- Sign In Modal -->
+    <div id="signin-modal" class="manga-modal hidden">
+        <div class="modal-box">
+            <button class="modal-close" id="btn-signin-close">✕</button>
+            <h3 class="modal-title" data-key="modal-signin-title">تسجيل الدخول</h3>
+            <form id="signin-form" class="modal-form">
+                <div class="form-group">
+                    <label for="signin-username" data-key="label-username">اسم المستخدم / البريد الإلكتروني</label>
+                    <input type="text" id="signin-username" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="signin-password" data-key="label-password">كلمة المرور</label>
+                    <input type="password" id="signin-password" required autocomplete="current-password">
+                </div>
+                <div class="form-error hidden" id="signin-error"></div>
+                <button type="submit" class="btn-primary w-100" data-key="btn-signin-submit">دخول</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sign Up Modal -->
+    <div id="signup-modal" class="manga-modal hidden">
+        <div class="modal-box">
+            <button class="modal-close" id="btn-signup-close">✕</button>
+            <h3 class="modal-title" data-key="modal-signup-title">إنشاء حساب جديد</h3>
+            <form id="signup-form" class="modal-form">
+                <div class="form-group">
+                    <label for="signup-name" data-key="label-fullname">الاسم الكامل</label>
+                    <input type="text" id="signup-name" required autocomplete="name">
+                </div>
+                <div class="form-group">
+                    <label for="signup-username" data-key="label-username">اسم المستخدم / البريد الإلكتروني</label>
+                    <input type="text" id="signup-username" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="signup-password" data-key="label-password">كلمة المرور</label>
+                    <input type="password" id="signup-password" required autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="signup-confirm" data-key="label-confirm-password">تأكيد كلمة المرور</label>
+                    <input type="password" id="signup-confirm" required autocomplete="new-password">
+                </div>
+                <div class="form-error hidden" id="signup-error"></div>
+                <button type="submit" class="btn-primary w-100" data-key="btn-signup-submit">إنشاء الحساب</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Javascript -->
+    <script src="app.js"></script>
+</body>
+</html>
