@@ -380,49 +380,7 @@ function resizeSlashCanvas() {
 resizeSlashCanvas();
 window.addEventListener('resize', resizeSlashCanvas);
 
-document.addEventListener('mousemove', (e) => {
-    customCursor.style.left = `${e.clientX}px`;
-    customCursor.style.top = `${e.clientY}px`;
-    createTrailSpark(e.clientX, e.clientY);
-});
-
-document.addEventListener('mousedown', () => {
-    customCursor.classList.add('clicking');
-});
-
-document.addEventListener('mouseup', () => {
-    customCursor.classList.remove('clicking');
-});
-
-function createTrailSpark(x, y) {
-    if (Math.random() > 0.45) return;
-    const spark = document.createElement('div');
-    spark.className = 'trail-spark';
-    spark.style.position = 'fixed';
-    spark.style.left = `${x}px`;
-    spark.style.top = `${y}px`;
-    spark.style.width = '6px';
-    spark.style.height = '6px';
-    spark.style.backgroundColor = Math.random() > 0.5 ? 'var(--color-crimson)' : 'var(--color-ink)';
-    spark.style.border = '1px solid var(--color-ink)';
-    spark.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 360}deg)`;
-    spark.style.pointerEvents = 'none';
-    spark.style.zIndex = '9999';
-    spark.style.transition = 'all 0.4s ease-out';
-    
-    document.body.appendChild(spark);
-    
-    setTimeout(() => {
-        const tx = (Math.random() - 0.5) * 40;
-        const ty = (Math.random() - 0.5) * 40;
-        spark.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0)`;
-        spark.style.opacity = '0';
-    }, 10);
-    
-    setTimeout(() => {
-        spark.remove();
-    }, 400);
-}
+// Cursor listeners disabled to restore standard performance
 
 function drawScreenSlash() {
     const w = slashCanvas.width;
@@ -926,6 +884,58 @@ typingInput.addEventListener('input', (e) => {
     typingInput.scrollTop = typingInput.scrollHeight;
 });
 
+// Intercept Tab and Enter keys for Code Indentation in Code Mode
+typingInput.addEventListener('keydown', (e) => {
+    const isCodeMode = (testTypeSelect && testTypeSelect.value === 'code');
+    if (!isCodeMode) return;
+
+    // 1. Tab Key: Insert 4 spaces
+    if (e.key === 'Tab') {
+        e.preventDefault(); // Prevent focus loss
+        
+        const start = typingInput.selectionStart;
+        const end = typingInput.selectionEnd;
+        const value = typingInput.value;
+        
+        typingInput.value = value.substring(0, start) + "    " + value.substring(end);
+        typingInput.selectionStart = typingInput.selectionEnd = start + 4;
+        
+        // Trigger the input event to run validation
+        typingInput.dispatchEvent(new Event('input'));
+        return;
+    }
+    
+    // 2. Enter Key: Auto-indent to match target code indentation
+    if (e.key === 'Enter') {
+        e.preventDefault(); // Prevent standard line break
+        
+        const start = typingInput.selectionStart;
+        const end = typingInput.selectionEnd;
+        const value = typingInput.value;
+        
+        const currentPosInQuote = start;
+        if (currentQuote[currentPosInQuote] === '\n') {
+            // Find how many spaces follow this '\n' in the target quote
+            let spacesToInsert = "";
+            let nextIdx = currentPosInQuote + 1;
+            while (nextIdx < currentQuote.length && currentQuote[nextIdx] === ' ') {
+                spacesToInsert += " ";
+                nextIdx++;
+            }
+            
+            typingInput.value = value.substring(0, start) + "\n" + spacesToInsert + value.substring(end);
+            typingInput.selectionStart = typingInput.selectionEnd = start + 1 + spacesToInsert.length;
+        } else {
+            // Fallback: insert standard newline
+            typingInput.value = value.substring(0, start) + "\n" + value.substring(end);
+            typingInput.selectionStart = typingInput.selectionEnd = start + 1;
+        }
+        
+        // Trigger the input event to run validation
+        typingInput.dispatchEvent(new Event('input'));
+    }
+});
+
 // Finalize typing test and open Rank modal
 function endTypingTest(finalWpm, finalAccuracy) {
     testRunning = false;
@@ -1057,23 +1067,46 @@ signUpForm.addEventListener('submit', (e) => {
         return;
     }
 
-    let users = JSON.parse(localStorage.getItem('portfolio_users') || '[]');
-    if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
-        signUpError.innerText = currentLang === 'ar' ? 'اسم المستخدم مسجل بالفعل.' : 'Username is already taken.';
-        signUpError.classList.remove('hidden');
-        return;
-    }
-
-    // Save
-    users.push({ name, username, password });
-    localStorage.setItem('portfolio_users', JSON.stringify(users));
-
-    // Session Login
-    localStorage.setItem('portfolio_current_user', JSON.stringify({ name, username }));
-    
-    playRankChime();
-    signUpModal.classList.add('hidden');
-    checkUserSession();
+    fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, username, password })
+    })
+    .then(res => {
+        if (!res.ok) {
+            return res.json().then(err => { throw new Error(err.detail || 'Sign up failed'); });
+        }
+        return res.json();
+    })
+    .then(data => {
+        localStorage.setItem('portfolio_current_user', JSON.stringify({ name: data.name, username: data.username }));
+        playRankChime();
+        signUpModal.classList.add('hidden');
+        checkUserSession();
+    })
+    .catch(err => {
+        // Fallback to local storage if API is offline
+        if (err.message.includes('Failed to fetch') || err.message.includes('Load failed')) {
+            let users = JSON.parse(localStorage.getItem('portfolio_users') || '[]');
+            if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+                signUpError.innerText = currentLang === 'ar' ? 'اسم المستخدم مسجل بالفعل.' : 'Username is already taken.';
+                signUpError.classList.remove('hidden');
+                return;
+            }
+            users.push({ name, username, password });
+            localStorage.setItem('portfolio_users', JSON.stringify(users));
+            localStorage.setItem('portfolio_current_user', JSON.stringify({ name, username }));
+            
+            playRankChime();
+            signUpModal.classList.add('hidden');
+            checkUserSession();
+        } else {
+            signUpError.innerText = err.message;
+            signUpError.classList.remove('hidden');
+        }
+    });
 });
 
 // Authenticate User
@@ -1082,21 +1115,46 @@ signInForm.addEventListener('submit', (e) => {
     const username = document.getElementById('signin-username').value.trim();
     const password = document.getElementById('signin-password').value;
 
-    let users = JSON.parse(localStorage.getItem('portfolio_users') || '[]');
-    const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+    fetch('/api/signin', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+    })
+    .then(res => {
+        if (!res.ok) {
+            return res.json().then(err => { throw new Error(err.detail || 'Sign in failed'); });
+        }
+        return res.json();
+    })
+    .then(data => {
+        localStorage.setItem('portfolio_current_user', JSON.stringify({ name: data.name, username: data.username }));
+        playRankChime();
+        signInModal.classList.add('hidden');
+        checkUserSession();
+    })
+    .catch(err => {
+        // Fallback to local storage if API is offline
+        if (err.message.includes('Failed to fetch') || err.message.includes('Load failed')) {
+            let users = JSON.parse(localStorage.getItem('portfolio_users') || '[]');
+            const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
 
-    if (!user) {
-        signInError.innerText = currentLang === 'ar' ? 'اسم المستخدم أو كلمة المرور غير صحيحة.' : 'Invalid username or password.';
-        signInError.classList.remove('hidden');
-        return;
-    }
+            if (!user) {
+                signInError.innerText = currentLang === 'ar' ? 'اسم المستخدم أو كلمة المرور غير صحيحة.' : 'Invalid username or password.';
+                signInError.classList.remove('hidden');
+                return;
+            }
 
-    // Session Login
-    localStorage.setItem('portfolio_current_user', JSON.stringify({ name: user.name, username: user.username }));
-
-    playRankChime();
-    signInModal.classList.add('hidden');
-    checkUserSession();
+            localStorage.setItem('portfolio_current_user', JSON.stringify({ name: user.name, username: user.username }));
+            playRankChime();
+            signInModal.classList.add('hidden');
+            checkUserSession();
+        } else {
+            signInError.innerText = err.message;
+            signInError.classList.remove('hidden');
+        }
+    });
 });
 
 // Manage Session Header

@@ -25,7 +25,6 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    cursor: none; /* Hide default cursor to use custom sword cursor */
 }
 
 html {
@@ -65,37 +64,16 @@ html[dir="rtl"] .logo-slash {
     background-size: 12px 12px;
     pointer-events: none;
     z-index: 999;
+    transform: translate3d(0,0,0);
+    will-change: transform;
 }
 
-/* Custom Cursor & Trail */
 #custom-cursor {
-    width: 20px;
-    height: 20px;
-    background: var(--color-crimson);
-    border: 3px solid var(--color-ink);
-    border-radius: 50%;
-    position: fixed;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 10000;
-    transition: width 0.1s, height 0.1s;
-}
-
-#custom-cursor.clicking {
-    width: 12px;
-    height: 12px;
-    background-color: var(--color-ink);
-    border-color: var(--color-crimson);
+    display: none !important;
 }
 
 #cursor-trail {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 9999;
+    display: none !important;
 }
 
 /* Sword Slash Screen Effect Canvas */
@@ -127,6 +105,8 @@ html[dir="rtl"] .logo-slash {
     );
     opacity: 0;
     transition: opacity 0.5s ease;
+    transform: translate3d(0,0,0);
+    will-change: transform;
 }
 
 #speed-lines.active {
