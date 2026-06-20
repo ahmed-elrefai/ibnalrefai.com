@@ -18,7 +18,7 @@ const translations = {
         'hero-role-label': 'صانع البرمجيات',
         'hero-main-title': 'البرمجة طاقة وتأثير',
         'hero-philosophy': 'أطور برمجيات عالية الكفاءة لمساعدة المحلات والشركات المحلية في مصر على النمو والتطور.',
-        'hero-status': 'خريج حاسبات عين شمس (2026) // مؤسس E5traat',
+        'hero-status': 'خريج حاسبات عين شمس // مؤسس E5traat',
         'panel-label-stats': 'بطاقة القوة',
         'badge-rank': 'الرتبة: SSS',
         'badge-class': 'الفئة: بايثون',
@@ -144,7 +144,7 @@ function updateQuoteSelectOptions() {
 
     const testType = typeSelect.value;
     const isRtl = (currentLang === 'ar');
-    
+
     // Store current value to restore if possible
     const currentVal = quoteSelect.value;
 
@@ -190,11 +190,11 @@ function updateQuoteSelectOptions() {
 function setLanguage(lang) {
     currentLang = lang;
     const isRtl = (lang === 'ar');
-    
+
     // Set HTML attribute direction and lang
     document.documentElement.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
     document.documentElement.setAttribute('lang', lang);
-    
+
     // Update elements with data-key
     document.querySelectorAll('[data-key]').forEach(el => {
         const key = el.getAttribute('data-key');
@@ -216,7 +216,7 @@ function setLanguage(lang) {
 
     // Update quote selector options dynamically
     updateQuoteSelectOptions();
-    
+
     if (isRtl) {
         soundToggle.innerText = soundEnabled ? '🔊 صوت: تفعيل' : '🔇 صامت';
         langToggle.innerText = '🌐 English';
@@ -224,14 +224,14 @@ function setLanguage(lang) {
         soundToggle.innerText = soundEnabled ? '🔊 SOUND ON' : '🔇 MUTED';
         langToggle.innerText = '🌐 العربية';
     }
-    
+
     // Update input field placeholder attributes
     const input = document.getElementById('typing-input');
     input.setAttribute('placeholder', translations[lang]['input-placeholder']);
-    
+
     // Load a quote in the selected language
     loadNewQuote();
-    
+
     // Update session header labels if initialized
     if (typeof checkUserSession === 'function') {
         checkUserSession();
@@ -258,49 +258,49 @@ function playSlashSound() {
     if (!soundEnabled) return;
     initAudio();
     const now = audioCtx.currentTime;
-    
+
     const filter = audioCtx.createBiquadFilter();
     filter.type = 'bandpass';
     filter.frequency.setValueAtTime(800, now);
     filter.frequency.exponentialRampToValueAtTime(80, now + 0.35);
     filter.Q.setValueAtTime(3.0, now);
-    
+
     const osc = audioCtx.createOscillator();
     osc.type = 'sawtooth';
     osc.frequency.setValueAtTime(600, now);
     osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
-    
+
     const bufferSize = audioCtx.sampleRate * 0.4;
     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
         data[i] = Math.random() * 2 - 1;
     }
-    
+
     const noiseNode = audioCtx.createBufferSource();
     noiseNode.buffer = buffer;
-    
+
     const noiseFilter = audioCtx.createBiquadFilter();
     noiseFilter.type = 'highpass';
     noiseFilter.frequency.setValueAtTime(1200, now);
     noiseFilter.frequency.exponentialRampToValueAtTime(300, now + 0.25);
-    
+
     const noiseGain = audioCtx.createGain();
     noiseGain.gain.setValueAtTime(0.35, now);
     noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-    
+
     noiseNode.connect(noiseFilter);
     noiseFilter.connect(noiseGain);
     noiseGain.connect(audioCtx.destination);
-    
+
     const oscGain = audioCtx.createGain();
     oscGain.gain.setValueAtTime(0.2, now);
     oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-    
+
     osc.connect(filter);
     filter.connect(oscGain);
     oscGain.connect(audioCtx.destination);
-    
+
     osc.start(now);
     osc.stop(now + 0.35);
     noiseNode.start(now);
@@ -311,26 +311,26 @@ function playKeySound() {
     if (!soundEnabled) return;
     initAudio();
     const now = audioCtx.currentTime;
-    
+
     const osc = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
     const filter = audioCtx.createBiquadFilter();
-    
+
     osc.type = 'triangle';
     osc.frequency.setValueAtTime(300 + Math.random() * 100, now);
     osc.frequency.exponentialRampToValueAtTime(100, now + 0.05);
-    
+
     filter.type = 'bandpass';
     filter.frequency.setValueAtTime(1000, now);
     filter.Q.setValueAtTime(5.0, now);
-    
+
     gainNode.gain.setValueAtTime(0.12, now);
     gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
-    
+
     osc.connect(filter);
     filter.connect(gainNode);
     gainNode.connect(audioCtx.destination);
-    
+
     osc.start(now);
     osc.stop(now + 0.05);
 }
@@ -339,26 +339,26 @@ function playRankChime() {
     if (!soundEnabled) return;
     initAudio();
     const now = audioCtx.currentTime;
-    
+
     playSlashSound();
     setTimeout(() => playSlashSound(), 150);
-    
+
     const notes = [220, 261.63, 293.66, 329.63, 392];
     notes.forEach((freq, idx) => {
         const osc = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
-        
+
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, now + idx * 0.1);
         osc.frequency.exponentialRampToValueAtTime(freq * 2, now + idx * 0.1 + 0.5);
-        
+
         gainNode.gain.setValueAtTime(0, now);
         gainNode.gain.linearRampToValueAtTime(0.15, now + idx * 0.1 + 0.05);
         gainNode.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 1.2);
-        
+
         osc.connect(gainNode);
         gainNode.connect(audioCtx.destination);
-        
+
         osc.start(now + idx * 0.1);
         osc.stop(now + idx * 0.1 + 1.2);
     });
@@ -389,9 +389,9 @@ function drawScreenSlash() {
     const startY = Math.random() * (h * 0.4) + h * 0.1;
     const endX = startX === 0 ? w : 0;
     const endY = Math.random() * (h * 0.4) + h * 0.5;
-    
+
     let progress = 0;
-    
+
     function animateSlash() {
         ctxSlash.clearRect(0, 0, w, h);
         ctxSlash.strokeStyle = 'var(--color-crimson)';
@@ -399,39 +399,39 @@ function drawScreenSlash() {
         ctxSlash.shadowColor = '#fff';
         ctxSlash.shadowBlur = 10;
         ctxSlash.lineCap = 'round';
-        
+
         ctxSlash.beginPath();
         const curX = startX + (endX - startX) * progress;
         const curY = startY + (endY - startY) * progress;
         ctxSlash.moveTo(startX, startY);
         ctxSlash.lineTo(curX, curY);
         ctxSlash.stroke();
-        
+
         progress += 0.15;
-        
+
         if (progress <= 1.05) {
             requestAnimationFrame(animateSlash);
         } else {
             fadeSlash(startX, startY, endX, endY);
         }
     }
-    
+
     function fadeSlash(sx, sy, ex, ey) {
         let opacity = 1.0;
-        
+
         function animateFade() {
             ctxSlash.clearRect(0, 0, w, h);
             ctxSlash.strokeStyle = `rgba(17, 17, 17, ${opacity})`;
             ctxSlash.lineWidth = 6;
             ctxSlash.shadowBlur = 0;
-            
+
             ctxSlash.beginPath();
             ctxSlash.moveTo(sx, sy);
             ctxSlash.lineTo(ex, ey);
             ctxSlash.stroke();
-            
+
             opacity -= 0.05;
-            
+
             if (opacity > 0) {
                 requestAnimationFrame(animateFade);
             } else {
@@ -440,7 +440,7 @@ function drawScreenSlash() {
         }
         animateFade();
     }
-    
+
     animateSlash();
 }
 
@@ -555,7 +555,7 @@ const quotesBank = {
 function getArabicCharVisual(char, i, length) {
     const isArabic = /[\u0600-\u06FF]/.test(char);
     if (!isArabic) return char;
-    
+
     let prefix = (i > 0) ? '\u200D' : '';
     let suffix = (i < length - 1) ? '\u200D' : '';
     return prefix + char + suffix;
@@ -625,12 +625,12 @@ function loadNewQuote() {
     timerStarted = false;
     testRunning = false;
     timeRemaining = TIMER_LIMIT;
-    
+
     const category = quoteSelect.value;
     const languageQuotes = quotesBank[currentLang][category];
     const randomIndex = Math.floor(Math.random() * languageQuotes.length);
     currentQuote = languageQuotes[randomIndex];
-    
+
     // Set text direction dynamically based on content (code/English should be LTR, Arabic RTL)
     const hasLatin = /[a-zA-Z]/.test(currentQuote);
     if (hasLatin) {
@@ -642,7 +642,7 @@ function loadNewQuote() {
         typingInput.style.direction = 'rtl';
         typingInput.style.textAlign = 'right';
     }
-    
+
     // Show/hide YouTube video hint
     const videoHintEl = document.getElementById('video-hint');
     if (videoHintEl) {
@@ -658,25 +658,25 @@ function loadNewQuote() {
             videoHintEl.classList.add('hidden');
         }
     }
-    
+
     // Find index of the first space in the quote (end of the first word)
     firstSpaceIndex = currentQuote.indexOf(' ');
-    
+
     // Parse into visual character elements
     wordsContainer.innerHTML = '';
     currentQuoteChars = [];
-    
+
     const testType = document.getElementById('test-type-select').value;
-    
+
     if (testType === 'code') {
         wordsContainer.classList.add('mode-code');
         wordsContainer.classList.remove('mode-text');
-        
+
         const lines = currentQuote.split('\n');
         lines.forEach((lineText, lineIdx) => {
             const lineEl = document.createElement('div');
             lineEl.className = 'code-line';
-            
+
             for (let i = 0; i < lineText.length; i++) {
                 const charEl = document.createElement('span');
                 charEl.className = 'char';
@@ -684,7 +684,7 @@ function loadNewQuote() {
                 lineEl.appendChild(charEl);
                 currentQuoteChars.push(charEl);
             }
-            
+
             // Add newline character at the end of the line (except for the last line)
             if (lineIdx < lines.length - 1) {
                 const newlineEl = document.createElement('span');
@@ -693,18 +693,18 @@ function loadNewQuote() {
                 lineEl.appendChild(newlineEl);
                 currentQuoteChars.push(newlineEl);
             }
-            
+
             wordsContainer.appendChild(lineEl);
         });
     } else {
         wordsContainer.classList.add('mode-text');
         wordsContainer.classList.remove('mode-code');
-        
+
         const wordsArray = currentQuote.split(' ');
         wordsArray.forEach((wordText, wordIdx) => {
             const wordEl = document.createElement('span');
             wordEl.className = 'word';
-            
+
             for (let i = 0; i < wordText.length; i++) {
                 const charEl = document.createElement('span');
                 charEl.className = 'char';
@@ -712,7 +712,7 @@ function loadNewQuote() {
                 wordEl.appendChild(charEl);
                 currentQuoteChars.push(charEl);
             }
-            
+
             // Add spaces between words
             if (wordIdx < wordsArray.length - 1) {
                 const spaceEl = document.createElement('span');
@@ -721,11 +721,11 @@ function loadNewQuote() {
                 wordEl.appendChild(spaceEl);
                 currentQuoteChars.push(spaceEl);
             }
-            
+
             wordsContainer.appendChild(wordEl);
         });
     }
-    
+
     // Reset indices and counts
     totalTypedCount = 0;
     errorsCount = 0;
@@ -733,15 +733,15 @@ function loadNewQuote() {
     mistakesCount = 0;
     comboStreak = 0;
     maxComboStreak = 0;
-    
+
     // Set first character as active
     if (currentQuoteChars.length > 0) {
         currentQuoteChars[0].classList.add('current');
     }
-    
+
     // Reset input value
     typingInput.value = '';
-    
+
     // Reset HUD displays
     updateHUD(0, 100, TIMER_LIMIT, 0);
     speedLines.classList.remove('active');
@@ -753,21 +753,21 @@ function updateHUD(wpm, accuracy, timeLeft, streak) {
     hudWpmValue.innerText = String(Math.round(wpm)).padStart(3, '0');
     const wpmPercent = Math.min((wpm / 120) * 100, 100);
     hudWpmBar.style.width = `${wpmPercent}%`;
-    
+
     // Accuracy
     hudAccValue.innerText = `${Math.round(accuracy)}%`;
     hudAccBar.style.width = `${accuracy}%`;
-    
+
     // Countdown Timer (capped at TIMER_LIMIT)
     hudTimerValue.innerText = String(Math.max(0, timeLeft));
     const timerPercent = (timeLeft / TIMER_LIMIT) * 100;
     hudTimerBar.style.width = `${Math.max(0, timerPercent)}%`;
-    
+
     // Combo Streak
     hudStreakValue.innerText = `x${streak}`;
     const streakPercent = Math.min((streak / 30) * 100, 100);
     hudStreakBar.style.width = `${streakPercent}%`;
-    
+
     // Combo speeds lines trigger
     if (streak >= 15) {
         speedLines.classList.add('active');
@@ -780,18 +780,18 @@ function updateHUD(wpm, accuracy, timeLeft, streak) {
 function startCountdownTimer() {
     timerStarted = true;
     testRunning = true;
-    
+
     timerInterval = setInterval(() => {
         timeRemaining--;
-        
+
         // Calculate WPM and Accuracy
         const elapsedSeconds = TIMER_LIMIT - timeRemaining;
         const correctCharsCount = currentQuoteChars.slice(0, totalTypedCount).filter(el => el.classList.contains('correct')).length;
         const liveWpm = elapsedSeconds > 0 ? (correctCharsCount / 5) / (elapsedSeconds / 60) : 0;
         const liveAccuracy = totalKeypresses > 0 ? ((totalKeypresses - mistakesCount) / totalKeypresses) * 100 : 100;
-        
+
         updateHUD(liveWpm, Math.max(0, liveAccuracy), timeRemaining, comboStreak);
-        
+
         if (timeRemaining <= 0) {
             clearInterval(timerInterval);
             endTypingTest(liveWpm, liveAccuracy);
@@ -803,26 +803,26 @@ function startCountdownTimer() {
 typingInput.addEventListener('input', (e) => {
     const typedVal = typingInput.value;
     totalTypedCount = typedVal.length;
-    
+
     // Sound on keypress
     playKeySound();
-    
+
     // Track stats
     if (e.inputType !== 'deleteContentBackward') {
         totalKeypresses++;
     }
-    
+
     // Loop through quote and evaluate letters
     let liveCorrectCount = 0;
     let liveErrorsCount = 0;
-    
+
     for (let i = 0; i < currentQuoteChars.length; i++) {
         const charEl = currentQuoteChars[i];
-        
+
         if (i < totalTypedCount) {
             // Evaluated characters
             charEl.classList.remove('current');
-            
+
             if (typedVal[i] === currentQuote[i]) {
                 charEl.classList.remove('incorrect');
                 charEl.classList.add('correct');
@@ -831,7 +831,7 @@ typingInput.addEventListener('input', (e) => {
                 charEl.classList.remove('correct');
                 charEl.classList.add('incorrect');
                 liveErrorsCount++;
-                
+
                 // Track mistakes on first match failure at this index
                 if (e.inputType !== 'deleteContentBackward' && i === totalTypedCount - 1) {
                     mistakesCount++;
@@ -847,7 +847,7 @@ typingInput.addEventListener('input', (e) => {
             charEl.classList.remove('correct', 'incorrect', 'current');
         }
     }
-    
+
     // Update streak on successful matching key
     if (e.inputType !== 'deleteContentBackward' && totalTypedCount > 0) {
         if (typedVal[totalTypedCount - 1] === currentQuote[totalTypedCount - 1]) {
@@ -858,7 +858,7 @@ typingInput.addEventListener('input', (e) => {
         // Decrease combo streak on backspaces slightly or keep
         comboStreak = Math.max(0, comboStreak - 1);
     }
-    
+
     // TIMER TRIGGER RULE: "works only when typing the first word, after the space.."
     // Trigger timer after typing the first word and hitting the first space
     if (!timerStarted && firstSpaceIndex !== -1 && totalTypedCount > firstSpaceIndex) {
@@ -866,14 +866,14 @@ typingInput.addEventListener('input', (e) => {
             startCountdownTimer();
         }
     }
-    
+
     // Live feedback stats calculations
     const elapsedSeconds = timerStarted ? (TIMER_LIMIT - timeRemaining) : 0.1;
     const liveWpm = timerStarted ? (liveCorrectCount / 5) / (elapsedSeconds / 60) : 0;
     const liveAccuracy = totalKeypresses > 0 ? ((totalKeypresses - mistakesCount) / totalKeypresses) * 100 : 100;
-    
+
     updateHUD(liveWpm, Math.max(0, liveAccuracy), timeRemaining, comboStreak);
-    
+
     // Check if quote completed fully
     if (totalTypedCount >= currentQuote.length && liveErrorsCount === 0) {
         clearInterval(timerInterval);
@@ -892,27 +892,27 @@ typingInput.addEventListener('keydown', (e) => {
     // 1. Tab Key: Insert 4 spaces
     if (e.key === 'Tab') {
         e.preventDefault(); // Prevent focus loss
-        
+
         const start = typingInput.selectionStart;
         const end = typingInput.selectionEnd;
         const value = typingInput.value;
-        
+
         typingInput.value = value.substring(0, start) + "    " + value.substring(end);
         typingInput.selectionStart = typingInput.selectionEnd = start + 4;
-        
+
         // Trigger the input event to run validation
         typingInput.dispatchEvent(new Event('input'));
         return;
     }
-    
+
     // 2. Enter Key: Auto-indent to match target code indentation
     if (e.key === 'Enter') {
         e.preventDefault(); // Prevent standard line break
-        
+
         const start = typingInput.selectionStart;
         const end = typingInput.selectionEnd;
         const value = typingInput.value;
-        
+
         const currentPosInQuote = start;
         if (currentQuote[currentPosInQuote] === '\n') {
             // Find how many spaces follow this '\n' in the target quote
@@ -922,7 +922,7 @@ typingInput.addEventListener('keydown', (e) => {
                 spacesToInsert += " ";
                 nextIdx++;
             }
-            
+
             typingInput.value = value.substring(0, start) + "\n" + spacesToInsert + value.substring(end);
             typingInput.selectionStart = typingInput.selectionEnd = start + 1 + spacesToInsert.length;
         } else {
@@ -930,7 +930,7 @@ typingInput.addEventListener('keydown', (e) => {
             typingInput.value = value.substring(0, start) + "\n" + value.substring(end);
             typingInput.selectionStart = typingInput.selectionEnd = start + 1;
         }
-        
+
         // Trigger the input event to run validation
         typingInput.dispatchEvent(new Event('input'));
     }
@@ -941,14 +941,14 @@ function endTypingTest(finalWpm, finalAccuracy) {
     testRunning = false;
     const cleanWpm = Math.round(finalWpm);
     const cleanAccuracy = Math.round(finalAccuracy);
-    
+
     playRankChime();
     drawScreenSlash();
-    
+
     // Rank evaluation (Bilingual labels)
     let title = "";
     let commentary = "";
-    
+
     if (currentLang === 'ar') {
         if (cleanWpm >= 90 && cleanAccuracy >= 95) {
             title = "مهندس خبير 👑";
@@ -978,13 +978,13 @@ function endTypingTest(finalWpm, finalAccuracy) {
             commentary = `"Slow and unsteady pace. You need to focus more on key muscle memory and precision to type at a professional speed."`;
         }
     }
-    
+
     // Populate overlay metrics
     rankTitle.innerText = title;
     rankWpm.innerText = `${cleanWpm} WPM`;
     rankAcc.innerText = `${cleanAccuracy}%`;
     rankCommentary.innerText = commentary;
-    
+
     // Show overlay
     setTimeout(() => {
         rankOverlay.classList.remove('hidden');
@@ -1074,39 +1074,39 @@ signUpForm.addEventListener('submit', (e) => {
         },
         body: JSON.stringify({ name, username, password })
     })
-    .then(res => {
-        if (!res.ok) {
-            return res.json().then(err => { throw new Error(err.detail || 'Sign up failed'); });
-        }
-        return res.json();
-    })
-    .then(data => {
-        localStorage.setItem('portfolio_current_user', JSON.stringify({ name: data.name, username: data.username }));
-        playRankChime();
-        signUpModal.classList.add('hidden');
-        checkUserSession();
-    })
-    .catch(err => {
-        // Fallback to local storage if API is offline
-        if (err.message.includes('Failed to fetch') || err.message.includes('Load failed')) {
-            let users = JSON.parse(localStorage.getItem('portfolio_users') || '[]');
-            if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
-                signUpError.innerText = currentLang === 'ar' ? 'اسم المستخدم مسجل بالفعل.' : 'Username is already taken.';
-                signUpError.classList.remove('hidden');
-                return;
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error(err.detail || 'Sign up failed'); });
             }
-            users.push({ name, username, password });
-            localStorage.setItem('portfolio_users', JSON.stringify(users));
-            localStorage.setItem('portfolio_current_user', JSON.stringify({ name, username }));
-            
+            return res.json();
+        })
+        .then(data => {
+            localStorage.setItem('portfolio_current_user', JSON.stringify({ name: data.name, username: data.username }));
             playRankChime();
             signUpModal.classList.add('hidden');
             checkUserSession();
-        } else {
-            signUpError.innerText = err.message;
-            signUpError.classList.remove('hidden');
-        }
-    });
+        })
+        .catch(err => {
+            // Fallback to local storage if API is offline
+            if (err.message.includes('Failed to fetch') || err.message.includes('Load failed')) {
+                let users = JSON.parse(localStorage.getItem('portfolio_users') || '[]');
+                if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+                    signUpError.innerText = currentLang === 'ar' ? 'اسم المستخدم مسجل بالفعل.' : 'Username is already taken.';
+                    signUpError.classList.remove('hidden');
+                    return;
+                }
+                users.push({ name, username, password });
+                localStorage.setItem('portfolio_users', JSON.stringify(users));
+                localStorage.setItem('portfolio_current_user', JSON.stringify({ name, username }));
+
+                playRankChime();
+                signUpModal.classList.add('hidden');
+                checkUserSession();
+            } else {
+                signUpError.innerText = err.message;
+                signUpError.classList.remove('hidden');
+            }
+        });
 });
 
 // Authenticate User
@@ -1122,49 +1122,49 @@ signInForm.addEventListener('submit', (e) => {
         },
         body: JSON.stringify({ username, password })
     })
-    .then(res => {
-        if (!res.ok) {
-            return res.json().then(err => { throw new Error(err.detail || 'Sign in failed'); });
-        }
-        return res.json();
-    })
-    .then(data => {
-        localStorage.setItem('portfolio_current_user', JSON.stringify({ name: data.name, username: data.username }));
-        playRankChime();
-        signInModal.classList.add('hidden');
-        checkUserSession();
-    })
-    .catch(err => {
-        // Fallback to local storage if API is offline
-        if (err.message.includes('Failed to fetch') || err.message.includes('Load failed')) {
-            let users = JSON.parse(localStorage.getItem('portfolio_users') || '[]');
-            const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
-
-            if (!user) {
-                signInError.innerText = currentLang === 'ar' ? 'اسم المستخدم أو كلمة المرور غير صحيحة.' : 'Invalid username or password.';
-                signInError.classList.remove('hidden');
-                return;
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error(err.detail || 'Sign in failed'); });
             }
-
-            localStorage.setItem('portfolio_current_user', JSON.stringify({ name: user.name, username: user.username }));
+            return res.json();
+        })
+        .then(data => {
+            localStorage.setItem('portfolio_current_user', JSON.stringify({ name: data.name, username: data.username }));
             playRankChime();
             signInModal.classList.add('hidden');
             checkUserSession();
-        } else {
-            signInError.innerText = err.message;
-            signInError.classList.remove('hidden');
-        }
-    });
+        })
+        .catch(err => {
+            // Fallback to local storage if API is offline
+            if (err.message.includes('Failed to fetch') || err.message.includes('Load failed')) {
+                let users = JSON.parse(localStorage.getItem('portfolio_users') || '[]');
+                const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+
+                if (!user) {
+                    signInError.innerText = currentLang === 'ar' ? 'اسم المستخدم أو كلمة المرور غير صحيحة.' : 'Invalid username or password.';
+                    signInError.classList.remove('hidden');
+                    return;
+                }
+
+                localStorage.setItem('portfolio_current_user', JSON.stringify({ name: user.name, username: user.username }));
+                playRankChime();
+                signInModal.classList.add('hidden');
+                checkUserSession();
+            } else {
+                signInError.innerText = err.message;
+                signInError.classList.remove('hidden');
+            }
+        });
 });
 
 // Manage Session Header
 function checkUserSession() {
     const currentUser = JSON.parse(localStorage.getItem('portfolio_current_user') || 'null');
     if (currentUser) {
-        const welcomeMsg = currentLang === 'ar' 
+        const welcomeMsg = currentLang === 'ar'
             ? `أهلاً، <span class="user-welcome-text">${currentUser.name}</span>!`
             : `Welcome, <span class="user-welcome-text">${currentUser.name}</span>!`;
-        
+
         const logoutBtnText = currentLang === 'ar' ? 'خروج' : 'LOGOUT';
 
         headerAuthActions.innerHTML = `
@@ -1211,8 +1211,8 @@ toastEl.className = 'manga-toast';
 document.body.appendChild(toastEl);
 
 function showPromoToast() {
-    const message = currentLang === 'ar' 
-        ? 'صفحة الترويج قريباً إن شاء الله! 🚀' 
+    const message = currentLang === 'ar'
+        ? 'صفحة الترويج قريباً إن شاء الله! 🚀'
         : 'Promo page is coming soon! 🚀';
     toastEl.innerText = message;
     toastEl.classList.add('show');
