@@ -13,8 +13,7 @@
     --border-manga-thin: 2px solid var(--color-ink);
     
     --font-ui: 'Tajawal', 'Space Grotesk', sans-serif;
-    --font-display: 'Dela Gothic One', 'Tajawal', sans-serif;
-    --font-japanese: 'Sawarabi Mincho', 'Tajawal', serif;
+    --font-display: 'Tajawal', 'Space Grotesk', sans-serif;
     --font-handwritten: 'Permanent Marker', 'Tajawal', cursive;
 }
 
@@ -297,6 +296,30 @@ html[dir="rtl"] .nav-link::after {
     box-shadow: 4px 4px 0px var(--color-ink);
 }
 
+.btn-coffee {
+    background-color: #FFDD00;
+    color: var(--color-ink);
+    border: var(--border-manga-thin);
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 4px 4px 0px var(--color-ink);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-coffee:hover {
+    background-color: #ffea5c;
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 0px var(--color-crimson);
+}
+
 /* ----------------------------------------------------
    HERO / PORTFOLIO LAYOUT (Manga Layout)
    ---------------------------------------------------- */
@@ -513,8 +536,8 @@ html[dir="rtl"] .design-label .black-outline {
     margin-right: 20px;
 }
 
-.main-japanese-title {
-    font-family: var(--font-japanese);
+.hero-main-title {
+    font-family: var(--font-display);
     font-size: 50px;
     font-weight: 900;
     color: var(--color-ink);
@@ -873,7 +896,7 @@ html[dir="rtl"] .btn-be-cool:hover .btn-arrow {
 }
 
 .arena-subtitle {
-    font-family: var(--font-japanese);
+    font-family: var(--font-display);
     font-weight: 900;
     font-size: 20px;
     color: var(--color-crimson);
@@ -916,6 +939,14 @@ html[dir="rtl"] .btn-be-cool:hover .btn-arrow {
 .hud-stat-box:hover {
     transform: translateY(-2px);
     box-shadow: 7px 7px 0px var(--color-crimson);
+}
+
+#hud-timer:not(.disabled) {
+    cursor: pointer;
+}
+
+#hud-timer:not(.disabled):hover {
+    border-color: var(--color-crimson);
 }
 
 .hud-stat-label {
@@ -1431,7 +1462,7 @@ html[dir="rtl"] .input-sword-decor {
         grid-column: span 1;
     }
     
-    .main-japanese-title {
+    .hero-main-title {
         font-size: 36px;
     }
     
@@ -1665,7 +1696,7 @@ html[lang="en"] .design-label .black-outline {
     margin-right: 0 !important;
 }
 
-html[lang="en"] .main-japanese-title {
+html[lang="en"] .hero-main-title {
     font-size: 32px !important;
     margin: 12px 0 !important;
 }
@@ -1681,7 +1712,7 @@ html[lang="en"] .tagline-text {
 }
 
 @media (max-width: 768px) {
-    html[lang="en"] .main-japanese-title {
+    html[lang="en"] .hero-main-title {
         font-size: 28px !important;
     }
 }

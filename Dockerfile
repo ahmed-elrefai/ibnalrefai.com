@@ -15,8 +15,8 @@ COPY main.py .
 COPY index.html .
 COPY app.js .
 COPY style.css .
-COPY me.png .
-COPY "REFAI's Stats Card.png" "REFAI's Stats Card.png"
+COPY me.webp .
+COPY refai_stats_card.webp .
 
 # Expose port 8000 for FastAPI / Uvicorn
 EXPOSE 8000

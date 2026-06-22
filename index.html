@@ -8,11 +8,11 @@
     <!-- Meta Descriptions for SEO -->
     <meta name="description"
         content="مرحباً بك في معرض أعمال رفاعي. أثبت سرعتك في حلبة تحدي الكتابة. تصميم مانجا ياباني مستوحى من كينجي من براول ستارز.">
-    <!-- Google Fonts: Space Grotesk, Dela Gothic One (bold manga look), Sawarabi Mincho, Tajawal (for beautiful Arabic typography) -->
+    <!-- Google Fonts: Space Grotesk, Tajawal (for beautiful Arabic/English typography) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Dela+Gothic+One&family=Sawarabi+Mincho&family=Tajawal:wght@400;500;700;900&family=Permanent+Marker&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Tajawal:wght@400;500;700;900&family=Permanent+Marker&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -55,8 +55,8 @@
             <a href="#typing-arena" class="nav-link highlight" data-key="nav-arena">تحدي سرعة الكتابة</a>
         </nav>
         <div class="header-actions" id="header-auth-actions">
-            <button class="btn-secondary" id="btn-signin" data-key="btn-signin">تسجيل الدخول</button>
-            <button class="btn-primary" id="btn-signup" data-key="btn-signup">أنشئ حساباً</button>
+            <a href="https://buymeacoffee.com/ahmedelrefai" target="_blank" rel="noopener noreferrer" class="btn-coffee"
+                data-key="btn-coffee">☕ ادعمنا</a>
         </div>
     </header>
 
@@ -72,8 +72,8 @@
             <!-- Panel 1: The Portrait (Left Panel) -->
             <div class="manga-panel panel-portrait" id="panel-me">
                 <div class="panel-inner">
-                    <img src="./me.png" alt="REFAI Portrait" class="manga-image portrait-img">
-                    <div class="panel-label">REFAI.PNG</div>
+                    <img src="./me.webp" alt="REFAI Portrait" class="manga-image portrait-img">
+                    <div class="panel-label">AHMED REFAI</div>
                     <!-- Decorative Manga Speed lines in panel -->
                     <div class="panel-speed-lines"></div>
                 </div>
@@ -87,7 +87,7 @@
                         <span class="black-outline" data-key="hero-role-label">صانع البرمجيات</span>
                     </div>
 
-                    <h1 class="main-japanese-title" data-key="hero-main-title">البرمجة طاقة وتأثير</h1>
+                    <h1 class="hero-main-title" data-key="hero-main-title">البرمجة طاقة وتأثير</h1>
                     <p class="sub-agency-text" data-key="hero-philosophy">أطور برمجيات عالية الكفاءة لمساعدة المحلات
                         والشركات المحلية في مصر على النمو والتطور.</p>
                     <p class="tagline-text" data-key="hero-status">خريج حاسبات عين شمس // مؤسس E5traat</p>
@@ -110,7 +110,7 @@
             <!-- Panel 3: Stats & Character Card (Right Panel - unclipped for perfect fit) -->
             <div class="manga-panel panel-stats" id="panel-stats-card">
                 <div class="panel-inner">
-                    <img src="./REFAI's Stats Card.png" alt="REFAI Stats Card" class="manga-image stats-img">
+                    <img src="./refai_stats_card.webp" alt="REFAI Stats Card" class="manga-image stats-img">
                     <div class="panel-label" data-key="panel-label-stats">بطاقة القوة</div>
                     <div class="character-card-overlay">
                         <div class="stat-badge" data-key="badge-rank">الرتبة: SSS</div>
@@ -315,6 +315,8 @@
                             id="rank-wpm">78 WPM</span></div>
                     <div class="metric"><span class="label" data-key="rank-acc-label">الدقة:</span> <span class="val"
                             id="rank-acc">98%</span></div>
+                    <div class="metric"><span class="label" data-key="rank-time-label">الوقت:</span> <span class="val"
+                            id="rank-time">0ث</span></div>
                 </div>
                 <p class="rank-commentary" id="rank-commentary">"أداء متميز. أصابعك سريعة وضرباتك متقنة تحت الضغط."</p>
                 <button id="btn-rank-close" class="btn-primary" data-key="rank-btn-close">تابع التدريب</button>
@@ -357,53 +359,7 @@
         </div>
     </footer>
 
-    <!-- Sign In Modal -->
-    <div id="signin-modal" class="manga-modal hidden">
-        <div class="modal-box">
-            <button class="modal-close" id="btn-signin-close">✕</button>
-            <h3 class="modal-title" data-key="modal-signin-title">تسجيل الدخول</h3>
-            <form id="signin-form" class="modal-form">
-                <div class="form-group">
-                    <label for="signin-username" data-key="label-username">اسم المستخدم / البريد الإلكتروني</label>
-                    <input type="text" id="signin-username" required autocomplete="username">
-                </div>
-                <div class="form-group">
-                    <label for="signin-password" data-key="label-password">كلمة المرور</label>
-                    <input type="password" id="signin-password" required autocomplete="current-password">
-                </div>
-                <div class="form-error hidden" id="signin-error"></div>
-                <button type="submit" class="btn-primary w-100" data-key="btn-signin-submit">دخول</button>
-            </form>
-        </div>
-    </div>
 
-    <!-- Sign Up Modal -->
-    <div id="signup-modal" class="manga-modal hidden">
-        <div class="modal-box">
-            <button class="modal-close" id="btn-signup-close">✕</button>
-            <h3 class="modal-title" data-key="modal-signup-title">إنشاء حساب جديد</h3>
-            <form id="signup-form" class="modal-form">
-                <div class="form-group">
-                    <label for="signup-name" data-key="label-fullname">الاسم الكامل</label>
-                    <input type="text" id="signup-name" required autocomplete="name">
-                </div>
-                <div class="form-group">
-                    <label for="signup-username" data-key="label-username">اسم المستخدم / البريد الإلكتروني</label>
-                    <input type="text" id="signup-username" required autocomplete="username">
-                </div>
-                <div class="form-group">
-                    <label for="signup-password" data-key="label-password">كلمة المرور</label>
-                    <input type="password" id="signup-password" required autocomplete="new-password">
-                </div>
-                <div class="form-group">
-                    <label for="signup-confirm" data-key="label-confirm-password">تأكيد كلمة المرور</label>
-                    <input type="password" id="signup-confirm" required autocomplete="new-password">
-                </div>
-                <div class="form-error hidden" id="signup-error"></div>
-                <button type="submit" class="btn-primary w-100" data-key="btn-signup-submit">إنشاء الحساب</button>
-            </form>
-        </div>
-    </div>
 
     <!-- Main Javascript -->
     <script src="app.js"></script>

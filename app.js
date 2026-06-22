@@ -10,8 +10,7 @@ const translations = {
         'nav-stats': 'الترويج',
         'nav-about': 'عني',
         'nav-arena': 'تحدي سرعة الكتابة',
-        'btn-signin': 'تسجيل الدخول',
-        'btn-signup': 'أنشئ حساباً',
+        'btn-coffee': '☕ ادعمنا',
         'bg-brush-1': 'عزيمة',
         'bg-brush-2': 'الوحش',
         'hero-name-label': 'أحمد الرفاعي',
@@ -46,6 +45,7 @@ const translations = {
         'hud-wpm': 'الكلمات/الدقيقة',
         'hud-accuracy': 'الدقة',
         'hud-timer': 'الوقت المتبقي',
+        'hud-timer-unlimited': 'الوقت المنقضي',
         'hud-streak': 'الضربات المتتالية',
         'input-placeholder': 'ابدأ بكتابة الكلمة الأولى واضغط مسافة لتشغيل المؤقت...',
         'btn-reset': 'إعادة المحاولة',
@@ -53,6 +53,7 @@ const translations = {
         'rank-heading': 'التقييم النهائي',
         'rank-wpm-label': 'السرعة:',
         'rank-acc-label': 'الدقة:',
+        'rank-time-label': 'الوقت المستغرق:',
         'rank-btn-close': 'تابع التدريب',
         'footer-desc': 'نطور برمجيات للمستقبل، ونبني حلولاً مخصصة لتمكين الأعمال.',
         'f-ranks-title': 'مستويات التقييم',
@@ -75,8 +76,7 @@ const translations = {
         'nav-stats': 'PROMO',
         'nav-about': 'ABOUT ME',
         'nav-arena': 'TYPING TEST',
-        'btn-signin': 'SIGN IN',
-        'btn-signup': 'SIGN UP',
+        'btn-coffee': '☕ Buy Me a Coffee',
         'bg-brush-1': 'WILLPOWER',
         'bg-brush-2': 'BEAST',
         'hero-name-label': 'AHMED ELREFAI',
@@ -111,6 +111,7 @@ const translations = {
         'hud-wpm': 'WORDS/MIN',
         'hud-accuracy': 'ACCURACY',
         'hud-timer': 'TIME REMAINING',
+        'hud-timer-unlimited': 'ELAPSED TIME',
         'hud-streak': 'COMBO STREAK',
         'input-placeholder': 'Type the first word and press Space to start the countdown...',
         'btn-reset': 'RESET TEST',
@@ -118,6 +119,7 @@ const translations = {
         'rank-heading': 'FINAL EVALUATION',
         'rank-wpm-label': 'SPEED:',
         'rank-acc-label': 'ACCURACY:',
+        'rank-time-label': 'TIME ELAPSED:',
         'rank-btn-close': 'CONTINUE TRAINING',
         'footer-desc': 'Engineering for the future, building custom solutions to empower businesses.',
         'f-ranks-title': 'EVALUATION LEVELS',
@@ -575,6 +577,8 @@ let maxComboStreak = 0;
 // Countdown Timer settings
 const TIMER_LIMIT = 30; // 30 seconds countdown
 let timeRemaining = TIMER_LIMIT;
+let timeElapsed = 0; // Tracks elapsed seconds
+let isUnlimitedMode = false;
 let timerInterval = null;
 let firstSpaceIndex = -1; // Index of the space ending the first word
 
@@ -600,6 +604,7 @@ const btnRankClose = document.getElementById('btn-rank-close');
 const rankTitle = document.getElementById('rank-title');
 const rankWpm = document.getElementById('rank-wpm');
 const rankAcc = document.getElementById('rank-acc');
+const rankTime = document.getElementById('rank-time');
 const rankCommentary = document.getElementById('rank-commentary');
 
 // Map of algorithm categories to their YouTube links
@@ -625,6 +630,11 @@ function loadNewQuote() {
     timerStarted = false;
     testRunning = false;
     timeRemaining = TIMER_LIMIT;
+
+    const hudTimerBox = document.getElementById('hud-timer');
+    if (hudTimerBox) {
+        hudTimerBox.classList.remove('disabled');
+    }
 
     const category = quoteSelect.value;
     const languageQuotes = quotesBank[currentLang][category];
@@ -733,6 +743,7 @@ function loadNewQuote() {
     mistakesCount = 0;
     comboStreak = 0;
     maxComboStreak = 0;
+    timeElapsed = 0;
 
     // Set first character as active
     if (currentQuoteChars.length > 0) {
@@ -743,7 +754,12 @@ function loadNewQuote() {
     typingInput.value = '';
 
     // Reset HUD displays
-    updateHUD(0, 100, TIMER_LIMIT, 0);
+    if (isUnlimitedMode) {
+        updateHUD(0, 100, 0, 0);
+    } else {
+        updateHUD(0, 100, TIMER_LIMIT, 0);
+    }
+    updateTimerHUD();
     speedLines.classList.remove('active');
 }
 
@@ -758,10 +774,16 @@ function updateHUD(wpm, accuracy, timeLeft, streak) {
     hudAccValue.innerText = `${Math.round(accuracy)}%`;
     hudAccBar.style.width = `${accuracy}%`;
 
-    // Countdown Timer (capped at TIMER_LIMIT)
-    hudTimerValue.innerText = String(Math.max(0, timeLeft));
-    const timerPercent = (timeLeft / TIMER_LIMIT) * 100;
-    hudTimerBar.style.width = `${Math.max(0, timerPercent)}%`;
+    // Countdown Timer or Unlimited Timer
+    if (isUnlimitedMode) {
+        hudTimerValue.innerText = String(timeLeft);
+        const progressPercent = currentQuote.length > 0 ? (totalTypedCount / currentQuote.length) * 100 : 0;
+        hudTimerBar.style.width = `${progressPercent}%`;
+    } else {
+        hudTimerValue.innerText = String(Math.max(0, timeLeft));
+        const timerPercent = (timeLeft / TIMER_LIMIT) * 100;
+        hudTimerBar.style.width = `${Math.max(0, timerPercent)}%`;
+    }
 
     // Combo Streak
     hudStreakValue.innerText = `x${streak}`;
@@ -781,22 +803,40 @@ function startCountdownTimer() {
     timerStarted = true;
     testRunning = true;
 
-    timerInterval = setInterval(() => {
-        timeRemaining--;
+    const hudTimerBox = document.getElementById('hud-timer');
+    if (hudTimerBox) {
+        hudTimerBox.classList.add('disabled');
+    }
 
-        // Calculate WPM and Accuracy
-        const elapsedSeconds = TIMER_LIMIT - timeRemaining;
-        const correctCharsCount = currentQuoteChars.slice(0, totalTypedCount).filter(el => el.classList.contains('correct')).length;
-        const liveWpm = elapsedSeconds > 0 ? (correctCharsCount / 5) / (elapsedSeconds / 60) : 0;
-        const liveAccuracy = totalKeypresses > 0 ? ((totalKeypresses - mistakesCount) / totalKeypresses) * 100 : 100;
+    if (isUnlimitedMode) {
+        timerInterval = setInterval(() => {
+            timeElapsed++;
 
-        updateHUD(liveWpm, Math.max(0, liveAccuracy), timeRemaining, comboStreak);
+            // Calculate WPM and Accuracy
+            const correctCharsCount = currentQuoteChars.slice(0, totalTypedCount).filter(el => el.classList.contains('correct')).length;
+            const liveWpm = timeElapsed > 0 ? (correctCharsCount / 5) / (timeElapsed / 60) : 0;
+            const liveAccuracy = totalKeypresses > 0 ? ((totalKeypresses - mistakesCount) / totalKeypresses) * 100 : 100;
 
-        if (timeRemaining <= 0) {
-            clearInterval(timerInterval);
-            endTypingTest(liveWpm, liveAccuracy);
-        }
-    }, 1000);
+            updateHUD(liveWpm, Math.max(0, liveAccuracy), timeElapsed, comboStreak);
+        }, 1000);
+    } else {
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            timeElapsed = TIMER_LIMIT - timeRemaining;
+
+            // Calculate WPM and Accuracy
+            const correctCharsCount = currentQuoteChars.slice(0, totalTypedCount).filter(el => el.classList.contains('correct')).length;
+            const liveWpm = timeElapsed > 0 ? (correctCharsCount / 5) / (timeElapsed / 60) : 0;
+            const liveAccuracy = totalKeypresses > 0 ? ((totalKeypresses - mistakesCount) / totalKeypresses) * 100 : 100;
+
+            updateHUD(liveWpm, Math.max(0, liveAccuracy), timeRemaining, comboStreak);
+
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                endTypingTest(liveWpm, liveAccuracy);
+            }
+        }, 1000);
+    }
 }
 
 // Typing input processing (Monkeytype comparison method)
@@ -868,11 +908,11 @@ typingInput.addEventListener('input', (e) => {
     }
 
     // Live feedback stats calculations
-    const elapsedSeconds = timerStarted ? (TIMER_LIMIT - timeRemaining) : 0.1;
+    const elapsedSeconds = timerStarted ? (isUnlimitedMode ? timeElapsed : (TIMER_LIMIT - timeRemaining)) : 0.1;
     const liveWpm = timerStarted ? (liveCorrectCount / 5) / (elapsedSeconds / 60) : 0;
     const liveAccuracy = totalKeypresses > 0 ? ((totalKeypresses - mistakesCount) / totalKeypresses) * 100 : 100;
 
-    updateHUD(liveWpm, Math.max(0, liveAccuracy), timeRemaining, comboStreak);
+    updateHUD(liveWpm, Math.max(0, liveAccuracy), (isUnlimitedMode ? timeElapsed : timeRemaining), comboStreak);
 
     // Check if quote completed fully
     if (totalTypedCount >= currentQuote.length && liveErrorsCount === 0) {
@@ -983,6 +1023,9 @@ function endTypingTest(finalWpm, finalAccuracy) {
     rankTitle.innerText = title;
     rankWpm.innerText = `${cleanWpm} WPM`;
     rankAcc.innerText = `${cleanAccuracy}%`;
+    if (rankTime) {
+        rankTime.innerText = currentLang === 'ar' ? `${timeElapsed}ث` : `${timeElapsed}s`;
+    }
     rankCommentary.innerText = commentary;
 
     // Show overlay
@@ -1011,195 +1054,10 @@ btnRankClose.addEventListener('click', () => {
 });
 
 // ----------------------------------------------------
-// AUTHENTICATION & MODAL INTERACTION SYSTEM
+// AUTHENTICATION & MODAL INTERACTION SYSTEM (DEPRECATED)
 // ----------------------------------------------------
-const signInModal = document.getElementById('signin-modal');
-const signUpModal = document.getElementById('signup-modal');
-const btnSignInClose = document.getElementById('btn-signin-close');
-const btnSignUpClose = document.getElementById('btn-signup-close');
-const signInForm = document.getElementById('signin-form');
-const signUpForm = document.getElementById('signup-form');
-const signInError = document.getElementById('signin-error');
-const signUpError = document.getElementById('signup-error');
-const headerAuthActions = document.getElementById('header-auth-actions');
-
-// Close Modals
-if (btnSignInClose) {
-    btnSignInClose.addEventListener('click', () => {
-        playSlashSound();
-        signInModal.classList.add('hidden');
-    });
-}
-if (btnSignUpClose) {
-    btnSignUpClose.addEventListener('click', () => {
-        playSlashSound();
-        signUpModal.classList.add('hidden');
-    });
-}
-
-// Close modals on overlay click
-window.addEventListener('click', (e) => {
-    if (e.target === signInModal) {
-        signInModal.classList.add('hidden');
-    }
-    if (e.target === signUpModal) {
-        signUpModal.classList.add('hidden');
-    }
-});
-
-// Register User
-signUpForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const name = document.getElementById('signup-name').value.trim();
-    const username = document.getElementById('signup-username').value.trim();
-    const password = document.getElementById('signup-password').value;
-    const confirm = document.getElementById('signup-confirm').value;
-
-    if (!name || !username || !password) {
-        signUpError.innerText = currentLang === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة.' : 'Please fill in all fields.';
-        signUpError.classList.remove('hidden');
-        return;
-    }
-
-    if (password !== confirm) {
-        signUpError.innerText = currentLang === 'ar' ? 'كلمات المرور غير متطابقة.' : 'Passwords do not match.';
-        signUpError.classList.remove('hidden');
-        return;
-    }
-
-    fetch('/api/signup', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name, username, password })
-    })
-        .then(res => {
-            if (!res.ok) {
-                return res.json().then(err => { throw new Error(err.detail || 'Sign up failed'); });
-            }
-            return res.json();
-        })
-        .then(data => {
-            localStorage.setItem('portfolio_current_user', JSON.stringify({ name: data.name, username: data.username }));
-            playRankChime();
-            signUpModal.classList.add('hidden');
-            checkUserSession();
-        })
-        .catch(err => {
-            // Fallback to local storage if API is offline
-            if (err.message.includes('Failed to fetch') || err.message.includes('Load failed')) {
-                let users = JSON.parse(localStorage.getItem('portfolio_users') || '[]');
-                if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
-                    signUpError.innerText = currentLang === 'ar' ? 'اسم المستخدم مسجل بالفعل.' : 'Username is already taken.';
-                    signUpError.classList.remove('hidden');
-                    return;
-                }
-                users.push({ name, username, password });
-                localStorage.setItem('portfolio_users', JSON.stringify(users));
-                localStorage.setItem('portfolio_current_user', JSON.stringify({ name, username }));
-
-                playRankChime();
-                signUpModal.classList.add('hidden');
-                checkUserSession();
-            } else {
-                signUpError.innerText = err.message;
-                signUpError.classList.remove('hidden');
-            }
-        });
-});
-
-// Authenticate User
-signInForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const username = document.getElementById('signin-username').value.trim();
-    const password = document.getElementById('signin-password').value;
-
-    fetch('/api/signin', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, password })
-    })
-        .then(res => {
-            if (!res.ok) {
-                return res.json().then(err => { throw new Error(err.detail || 'Sign in failed'); });
-            }
-            return res.json();
-        })
-        .then(data => {
-            localStorage.setItem('portfolio_current_user', JSON.stringify({ name: data.name, username: data.username }));
-            playRankChime();
-            signInModal.classList.add('hidden');
-            checkUserSession();
-        })
-        .catch(err => {
-            // Fallback to local storage if API is offline
-            if (err.message.includes('Failed to fetch') || err.message.includes('Load failed')) {
-                let users = JSON.parse(localStorage.getItem('portfolio_users') || '[]');
-                const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
-
-                if (!user) {
-                    signInError.innerText = currentLang === 'ar' ? 'اسم المستخدم أو كلمة المرور غير صحيحة.' : 'Invalid username or password.';
-                    signInError.classList.remove('hidden');
-                    return;
-                }
-
-                localStorage.setItem('portfolio_current_user', JSON.stringify({ name: user.name, username: user.username }));
-                playRankChime();
-                signInModal.classList.add('hidden');
-                checkUserSession();
-            } else {
-                signInError.innerText = err.message;
-                signInError.classList.remove('hidden');
-            }
-        });
-});
-
-// Manage Session Header
 function checkUserSession() {
-    const currentUser = JSON.parse(localStorage.getItem('portfolio_current_user') || 'null');
-    if (currentUser) {
-        const welcomeMsg = currentLang === 'ar'
-            ? `أهلاً، <span class="user-welcome-text">${currentUser.name}</span>!`
-            : `Welcome, <span class="user-welcome-text">${currentUser.name}</span>!`;
-
-        const logoutBtnText = currentLang === 'ar' ? 'خروج' : 'LOGOUT';
-
-        headerAuthActions.innerHTML = `
-            <div class="user-profile-badge">
-                <span>${welcomeMsg}</span>
-                <button class="btn-secondary" id="btn-logout">${logoutBtnText}</button>
-            </div>
-        `;
-
-        document.getElementById('btn-logout').addEventListener('click', () => {
-            playSlashSound();
-            localStorage.removeItem('portfolio_current_user');
-            checkUserSession();
-        });
-    } else {
-        const signInText = currentLang === 'ar' ? 'تسجيل الدخول' : 'SIGN IN';
-        const signUpText = currentLang === 'ar' ? 'أنشئ حساباً' : 'SIGN UP';
-        headerAuthActions.innerHTML = `
-            <button class="btn-secondary" id="btn-signin">${signInText}</button>
-            <button class="btn-primary" id="btn-signup">${signUpText}</button>
-        `;
-
-        document.getElementById('btn-signin').addEventListener('click', () => {
-            playSlashSound();
-            signInError.classList.add('hidden');
-            signInForm.reset();
-            signInModal.classList.remove('hidden');
-        });
-        document.getElementById('btn-signup').addEventListener('click', () => {
-            playSlashSound();
-            signUpError.classList.add('hidden');
-            signUpForm.reset();
-            signUpModal.classList.remove('hidden');
-        });
-    }
+    // Session management disabled since auth is replaced by Buy Me A Coffee
 }
 
 // ----------------------------------------------------
@@ -1239,6 +1097,35 @@ if (testTypeSelect) {
         updateQuoteSelectOptions();
         loadNewQuote();
         typingInput.focus();
+    });
+}
+
+// ----------------------------------------------------
+// UNLIMITED TIMER TOGGLE FUNCTIONALITY
+// ----------------------------------------------------
+const hudTimerBox = document.getElementById('hud-timer');
+
+function updateTimerHUD() {
+    const timerLabel = document.querySelector('#hud-timer .hud-stat-label');
+    if (!timerLabel) return;
+    if (isUnlimitedMode) {
+        timerLabel.innerText = currentLang === 'ar' ? 'الوقت المنقضي' : 'ELAPSED TIME';
+        timerLabel.setAttribute('data-key', 'hud-timer-unlimited');
+    } else {
+        timerLabel.innerText = currentLang === 'ar' ? 'الوقت المتبقي' : 'TIME REMAINING';
+        timerLabel.setAttribute('data-key', 'hud-timer');
+    }
+}
+
+if (hudTimerBox) {
+    hudTimerBox.addEventListener('click', () => {
+        // Toggle only if the test hasn't started yet
+        if (!timerStarted && !testRunning) {
+            isUnlimitedMode = !isUnlimitedMode;
+            playSlashSound();
+            loadNewQuote();
+            typingInput.focus();
+        }
     });
 }
 
