@@ -1011,13 +1011,14 @@ html[dir="rtl"] .btn-be-cool:hover .btn-arrow {
 }
 
 .typing-box {
-    min-height: 140px;
+    max-height: 200px;
     font-size: 24px;
     line-height: 1.8;
     color: var(--color-gray);
     position: relative;
     user-select: none;
     margin-bottom: 24px;
+    overflow: hidden;
 }
 
 /* Inner Words Container */

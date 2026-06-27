@@ -158,6 +158,7 @@ function updateQuoteSelectOptions() {
             { value: 'bubble_sort', textAr: 'فرز الفقاعات // Bubble Sort', textEn: 'Bubble Sort (Python)' },
             { value: 'insertion_sort', textAr: 'فرز الإدخال // Insertion Sort', textEn: 'Insertion Sort (Python)' },
             { value: 'selection_sort', textAr: 'فرز الاختيار // Selection Sort', textEn: 'Selection Sort (Python)' },
+            { value: 'merge_sort', textAr: 'فرز الدمج // Merge Sort', textEn: 'Merge Sort (Python)' },
             { value: 'kadane_algorithm', textAr: 'خوارزمية كادان // Kadane\'s Algorithm', textEn: 'Kadane\'s Algorithm (Python)' }
         ];
         options.forEach(opt => {
@@ -512,6 +513,9 @@ const quotesBank = {
         selection_sort: [
             "def selection_sort(arr):\n    n = len(arr)\n    for i in range(n):\n        min_idx = i\n        for j in range(i + 1, n):\n            if arr[j] < arr[min_idx]:\n                min_idx = j\n        arr[i], arr[min_idx] = arr[min_idx], arr[i]\n    return arr"
         ],
+        merge_sort: [
+            "def merge_sort(arr):\n    if len(arr) <= 1:\n        return arr\n    mid = len(arr) // 2\n    L = merge_sort(arr[:mid])\n    R = merge_sort(arr[mid:])\n    return merge(L, R)\n\ndef merge(L, R):\n    res = []\n    i = j = 0\n    while i < len(L) and j < len(R):\n        if L[i] < R[j]:\n            res.append(L[i])\n            i += 1\n        else:\n            res.append(R[j])\n            j += 1\n    res.extend(L[i:])\n    res.extend(R[j:])\n    return res"
+        ],
         kadane_algorithm: [
             "def max_subarray_sum(arr):\n    max_so_far = arr[0]\n    curr_max = arr[0]\n    for i in range(1, len(arr)):\n        curr_max = max(arr[i], curr_max + arr[i])\n        max_so_far = max(max_so_far, curr_max)\n    return max_so_far"
         ]
@@ -543,6 +547,9 @@ const quotesBank = {
         ],
         selection_sort: [
             "def selection_sort(arr):\n    n = len(arr)\n    for i in range(n):\n        min_idx = i\n        for j in range(i + 1, n):\n            if arr[j] < arr[min_idx]:\n                min_idx = j\n        arr[i], arr[min_idx] = arr[min_idx], arr[i]\n    return arr"
+        ],
+        merge_sort: [
+            "def merge_sort(arr):\n    if len(arr) <= 1:\n        return arr\n    mid = len(arr) // 2\n    L = merge_sort(arr[:mid])\n    R = merge_sort(arr[mid:])\n    return merge(L, R)\n\ndef merge(L, R):\n    res = []\n    i = j = 0\n    while i < len(L) and j < len(R):\n        if L[i] < R[j]:\n            res.append(L[i])\n            i += 1\n        else:\n            res.append(R[j])\n            j += 1\n    res.extend(L[i:])\n    res.extend(R[j:])\n    return res"
         ],
         kadane_algorithm: [
             "def max_subarray_sum(arr):\n    max_so_far = arr[0]\n    curr_max = arr[0]\n    for i in range(1, len(arr)):\n        curr_max = max(arr[i], curr_max + arr[i])\n        max_so_far = max(max_so_far, curr_max)\n    return max_so_far"
@@ -753,6 +760,12 @@ function loadNewQuote() {
     // Reset input value
     typingInput.value = '';
 
+    // Reset typing box scroll position
+    const typingBox = document.getElementById('typing-box');
+    if (typingBox) {
+        typingBox.scrollTop = 0;
+    }
+
     // Reset HUD displays
     if (isUnlimitedMode) {
         updateHUD(0, 100, 0, 0);
@@ -922,6 +935,21 @@ typingInput.addEventListener('input', (e) => {
 
     // Auto scroll textarea to follow typing cursor
     typingInput.scrollTop = typingInput.scrollHeight;
+
+    // Auto scroll typing box to keep current character in view
+    const activeChar = wordsContainer.querySelector('.char.current');
+    if (activeChar) {
+        const typingBox = document.getElementById('typing-box');
+        if (typingBox) {
+            const charRect = activeChar.getBoundingClientRect();
+            const boxRect = typingBox.getBoundingClientRect();
+            const relativeTop = charRect.top - boxRect.top + typingBox.scrollTop;
+            const containerHeight = typingBox.clientHeight;
+            const charHeight = charRect.height || 28;
+            const targetScrollTop = relativeTop - (containerHeight / 2) + (charHeight / 2);
+            typingBox.scrollTop = targetScrollTop;
+        }
+    }
 });
 
 // Intercept Tab and Enter keys for Code Indentation in Code Mode
