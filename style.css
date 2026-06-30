@@ -1435,7 +1435,7 @@ html[dir="rtl"] .input-sword-decor {
         clip-path: none;
     }
     
-    .panel-stats {
+    .panel-stats, .panel-contact-form {
         grid-column: span 2;
         height: auto;
     }
@@ -1459,7 +1459,7 @@ html[dir="rtl"] .input-sword-decor {
         gap: 16px;
     }
     
-    .panel-stats {
+    .panel-stats, .panel-contact-form {
         grid-column: span 1;
     }
     
@@ -1717,3 +1717,117 @@ html[lang="en"] .tagline-text {
         font-size: 28px !important;
     }
 }
+
+/* ----------------------------------------------------
+   HERO PANEL CONTACT FORM
+   ---------------------------------------------------- */
+.panel-contact-form {
+    border: var(--border-manga);
+    background-color: white;
+}
+
+.panel-contact-form .panel-inner {
+    padding: 24px 20px 20px 20px;
+    justify-content: flex-start;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-screentone {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(0,0,0,0.03) 1.5px, transparent 0);
+    background-size: 8px 8px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.hero-contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+.hero-contact-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.hero-contact-form label {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--color-ink);
+}
+
+.hero-contact-form input,
+.hero-contact-form textarea {
+    border: var(--border-manga-thin);
+    padding: 8px 12px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: var(--color-ink);
+    outline: none;
+    background: #fafafa;
+    border-radius: 4px;
+    box-shadow: 2px 2px 0px var(--color-light-gray);
+    transition: all 0.2s;
+}
+
+.hero-contact-form textarea {
+    resize: none;
+    height: 70px;
+}
+
+.hero-contact-form input:focus,
+.hero-contact-form textarea:focus {
+    box-shadow: 2px 2px 0px var(--color-crimson);
+    background-color: white;
+}
+
+/* Submit Button styled like btn-be-cool but compact */
+.btn-submit-contact {
+    position: relative;
+    background-color: var(--color-crimson);
+    color: white;
+    border: var(--border-manga-thin);
+    padding: 10px 20px;
+    font-family: var(--font-display);
+    font-size: 14px;
+    letter-spacing: 1px;
+    box-shadow: 3px 3px 0px var(--color-ink);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    width: 100%;
+    align-self: center;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-submit-contact:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0px var(--color-ink);
+}
+
+.btn-submit-contact:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px var(--color-ink);
+}
+
+.btn-submit-contact:disabled {
+    background-color: var(--color-gray);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 2px 2px 0px var(--color-ink);
+}
+
+

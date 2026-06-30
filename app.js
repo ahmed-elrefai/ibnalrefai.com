@@ -68,7 +68,17 @@ const translations = {
         'btn-signup-submit': 'إنشاء الحساب',
         'test-type-label': 'نوع التحدي:',
         'opt-code': 'كود برمجي (بايثون)',
-        'opt-text': 'نص عادي'
+        'opt-text': 'نص عادي',
+        'nav-contact': 'تواصل معي',
+        'contact-title': 'تواصل معي',
+        'contact-subtitle': 'مهتم بالعمل معي لبناء مشروعك؟ أرسل تفاصيل مشروعك وسأرد عليك قريباً.',
+        'label-email': 'البريد الإلكتروني',
+        'label-subject': 'الموضوع',
+        'label-message': 'تفاصيل المشروع / الرسالة',
+        'btn-submit-contact': 'إرسال الرسالة',
+        'email-placeholder': 'بريدك الإلكتروني...',
+        'subject-placeholder': 'طلب مشروع جديد، عمل، إلخ...',
+        'message-placeholder': 'اكتب تفاصيل مشروعك أو فكرتك وسأتواصل معك في أقرب وقت...'
     },
     en: {
         'nav-home': 'HOME',
@@ -134,7 +144,17 @@ const translations = {
         'btn-signup-submit': 'CREATE ACCOUNT',
         'test-type-label': 'CHALLENGE TYPE:',
         'opt-code': 'Coding (Python)',
-        'opt-text': 'Regular Text'
+        'opt-text': 'Regular Text',
+        'nav-contact': 'CONTACT ME',
+        'contact-title': 'CONTACT ME',
+        'contact-subtitle': 'Interested in working with me to build your project? Send your details and I\'ll get back to you soon.',
+        'label-email': 'Email Address',
+        'label-subject': 'Subject',
+        'label-message': 'Project Details / Message',
+        'btn-submit-contact': 'SEND MESSAGE',
+        'email-placeholder': 'Your email address...',
+        'subject-placeholder': 'Project request, business inquiry, etc...',
+        'message-placeholder': 'Describe your project or ideas and I will get back to you as soon as possible...'
     }
 };
 
@@ -202,14 +222,19 @@ function setLanguage(lang) {
     document.querySelectorAll('[data-key]').forEach(el => {
         const key = el.getAttribute('data-key');
         if (translations[lang] && translations[lang][key]) {
-            // Check if element is an input with placeholder
-            if (el.tagName === 'INPUT' && el.hasAttribute('placeholder')) {
+            // Check if element is an input or textarea with placeholder
+            if ((el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') && el.hasAttribute('placeholder')) {
                 el.setAttribute('placeholder', translations[lang][key]);
             } else {
-                // Keep the structural span elements in BE COOL! button or logos
+                // Keep the structural span elements in BE COOL! button, submit button or logos
                 const textNode = translations[lang][key];
-                if (key === 'btn-be-cool') {
-                    el.querySelector('.btn-text').innerText = textNode;
+                if (key === 'btn-be-cool' || key === 'btn-submit-contact') {
+                    const btnTextSpan = el.querySelector('.btn-text');
+                    if (btnTextSpan) {
+                        btnTextSpan.innerText = textNode;
+                    } else {
+                        el.innerText = textNode;
+                    }
                 } else {
                     el.innerText = textNode;
                 }
@@ -1096,17 +1121,21 @@ const toastEl = document.createElement('div');
 toastEl.className = 'manga-toast';
 document.body.appendChild(toastEl);
 
-function showPromoToast() {
-    const message = currentLang === 'ar'
-        ? 'صفحة الترويج قريباً إن شاء الله! 🚀'
-        : 'Promo page is coming soon! 🚀';
+function showToast(message) {
     toastEl.innerText = message;
     toastEl.classList.add('show');
     playSlashSound();
 
     setTimeout(() => {
         toastEl.classList.remove('show');
-    }, 3000);
+    }, 4000);
+}
+
+function showPromoToast() {
+    const message = currentLang === 'ar'
+        ? 'صفحة الترويج قريباً إن شاء الله! 🚀'
+        : 'Promo page is coming soon! 🚀';
+    showToast(message);
 }
 
 if (navPromo) {
@@ -1154,6 +1183,68 @@ if (hudTimerBox) {
             loadNewQuote();
             typingInput.focus();
         }
+    });
+}
+
+// ----------------------------------------------------
+// CONTACT FORM SUBMISSION SYSTEM
+// ----------------------------------------------------
+const contactForm = document.getElementById('contact-form');
+if (contactForm) {
+    contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Visual slash feedback
+        playSlashSound();
+        drawScreenSlash();
+
+        const submitBtn = document.getElementById('btn-submit-contact');
+        let originalText = "";
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            const btnTextSpan = submitBtn.querySelector('.btn-text');
+            if (btnTextSpan) {
+                originalText = btnTextSpan.innerText;
+                btnTextSpan.innerText = currentLang === 'ar' ? 'جاري الإرسال...' : 'Sending...';
+            }
+        }
+
+        const email = document.getElementById('contact-email').value;
+        const subject = document.getElementById('contact-subject').value;
+        const message = document.getElementById('contact-message').value;
+
+        fetch("https://formsubmit.co/ajax/55c9fb9144da9e7d805c9e089a4d2c9a", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                subject: subject,
+                message: message
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    showToast(currentLang === 'ar' ? 'تم إرسال رسالتك بنجاح! سأتواصل معك قريباً. 👍' : 'Message sent successfully! I will get back to you soon. 👍');
+                    contactForm.reset();
+                } else {
+                    throw new Error("Failed to send");
+                }
+            })
+            .catch(error => {
+                showToast(currentLang === 'ar' ? 'عذراً، حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى. ❌' : 'Sorry, something went wrong. Please try again. ❌');
+            })
+            .finally(() => {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    const btnTextSpan = submitBtn.querySelector('.btn-text');
+                    if (btnTextSpan && originalText) {
+                        btnTextSpan.innerText = originalText;
+                    }
+                }
+            });
     });
 }
 
