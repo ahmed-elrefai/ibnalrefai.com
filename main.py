@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 
 app = FastAPI(
-    title="Refai Portfolio API",
+    title="Ahmed Elrefai Portfolio API",
     description="FastAPI Backend for Ahmed Elrefai's Portfolio",
     version="1.0.0"
 )
